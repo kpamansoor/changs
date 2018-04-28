@@ -53,10 +53,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("Fund Details");
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setIcon(R.drawable.logo);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+//        getSupportActionBar().setIcon(R.drawable.logo);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         coordinatorLayout = (RelativeLayout) findViewById(R.id.constraintlayout);
         webView = (WebView) findViewById(R.id.webView);
         noInternet = (ImageView) findViewById(R.id.noInternet);
@@ -66,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("https://docs.google.com/spreadsheets/d/1ZbIhIF0LIceke3g7uSBG4c0pYGlxFE9KdH_ntb63AFE/edit#gid=0");
 
 //        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259830");// Testing
-        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259828");// Production
+        MobileAds.initialize(this, "ca-app-pub-1243068719441957~8454423603");// Production
         mInterstitialAd = new InterstitialAd(this);
 //        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
-        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/7477993022"); // Production
+        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/8884958007"); // Production
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         dialog = new ProgressDialog(MainActivity.this);
@@ -78,12 +77,12 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new MyWebViewClient());
 
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
-            @Override
-            public void onRefresh() {
-                webView.reload();
-            }
-        });
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+//            @Override
+//            public void onRefresh() {
+//                webView.reload();
+//            }
+//        });
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
