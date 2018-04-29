@@ -3,6 +3,7 @@ package com.mansoor.changs;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -31,32 +32,30 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
-    private InterstitialAd mInterstitialAd;
     public static int TYPE_WIFI = 1;
     public static int TYPE_MOBILE = 2;
     public static int TYPE_NOT_CONNECTED = 0;
     private Snackbar snackbar;
     private boolean internetConnected = true;
-    private RelativeLayout coordinatorLayout;
+    private RelativeLayout swipe_refresh_layout;
     ImageView noInternet;
     ProgressDialog dialog = null;
     SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private AdView mAdView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("Fund Details");
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-//        getSupportActionBar().setIcon(R.drawable.logo);
-
-        coordinatorLayout = (RelativeLayout) findViewById(R.id.constraintlayout);
+        swipe_refresh_layout = (RelativeLayout) findViewById(R.id.swipe_refresh_layout);
         webView = (WebView) findViewById(R.id.webView);
         noInternet = (ImageView) findViewById(R.id.noInternet);
         webView.getSettings().setLoadsImagesAutomatically(true);
@@ -64,65 +63,23 @@ public class MainActivity extends AppCompatActivity {
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         webView.loadUrl("https://docs.google.com/spreadsheets/d/1ZbIhIF0LIceke3g7uSBG4c0pYGlxFE9KdH_ntb63AFE/edit#gid=0");
 
-//        MobileAds.initialize(this, "ca-app-pub-1243068719441957~6001259830");// Testing
-        MobileAds.initialize(this, "ca-app-pub-1243068719441957~8454423603");// Production
-        mInterstitialAd = new InterstitialAd(this);
-//        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712"); // Testing
-        mInterstitialAd.setAdUnitId("ca-app-pub-1243068719441957/8884958007"); // Production
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Loading fund details...");
         dialog.setCancelable(true);
         webView.setWebViewClient(new MyWebViewClient());
 
-
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
-//            @Override
-//            public void onRefresh() {
-//                webView.reload();
-//            }
-//        });
-        mInterstitialAd.setAdListener(new AdListener() {
+        mAdView = (AdView) findViewById(R.id.adView);
+        final AdRequest adRequest = new AdRequest.Builder().build();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onAdClosed() {
-                // Load the next interstitial.
-                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            public void run() {
+                // Do something after 5s = 5000ms
+                mAdView.loadAd(adRequest);
             }
+        }, 5000);
 
-        });
 
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-                Log.i("Ads", "onAdLoaded");
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                // Code to be executed when an ad request fails.
-                Log.i("Ads", "onAdFailedToLoad");
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when the ad is displayed.
-                Log.i("Ads", "onAdOpened");
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                // Code to be executed when the user has left the app.
-                Log.i("Ads", "onAdLeftApplication");
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when when the interstitial ad is closed.
-                Log.i("Ads", "onAdClosed");
-            }
-        });
     }
 
     @Override
@@ -158,11 +115,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         registerInternetCheckReceiver();
         finish();
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            Log.d("TAG", "The interstitial wasn't loaded yet.");
-        }
+
     }
 
     /**
@@ -221,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
             webView.setVisibility(View.VISIBLE);
             noInternet.setVisibility(View.GONE);
             snackbar = Snackbar
-                    .make(coordinatorLayout, internetStatus, Snackbar.LENGTH_LONG)
+                    .make(swipe_refresh_layout, internetStatus, Snackbar.LENGTH_LONG)
                     .setAction("OK", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -234,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             webView.setVisibility(View.GONE);
             noInternet.setVisibility(View.VISIBLE);
             snackbar = Snackbar
-                    .make(coordinatorLayout, internetStatus, Snackbar.LENGTH_LONG)
+                    .make(swipe_refresh_layout, internetStatus, Snackbar.LENGTH_LONG)
                     .setAction("SETTINGS", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
